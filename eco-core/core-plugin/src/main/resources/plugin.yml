@@ -1,27 +1,17 @@
-name: EcoSkills
-version: ${projectVersion}
+name: ${pluginName}
+version: ${version}
 main: com.willfp.ecoskills.EcoSkillsPlugin
-api-version: 1.16
+api-version: 1.17
 authors: [ Auxilor ]
 website: willfp.com
-load: STARTUP
 depend:
   - eco
   - ProtocolLib
 softdepend:
   - EnchantGui
-  - AureliumSkills
-  - Vault
-  - mcMMO
-  - Jobs
-  - TMMobcoins
+  - libreforge
   - EcoEnchants
-  - EcoBosses
-  - Talismans
-  - EcoArmor
-  - EcoItems
-  - Boosters
-  - EcoPets
+
 commands:
   ecoskills:
     description: Base Command
@@ -53,8 +43,6 @@ permissions:
       ecoskills.command.recount: true
       ecoskills.command.toggleactionbar: true
       ecoskills.command.togglesound: true
-      ecoskills.command.import: true
-      ecoskills.command.export: true
 
   ecoskills.command.reload:
     description: Allows reloading the config
@@ -85,12 +73,6 @@ permissions:
     default: op
   ecoskills.command.togglesound:
     description: Allows the use of /skills togglesound.
-    default: op
-  ecoskills.command.import:
-    description: Allows the use of /ecoskills import.
-    default: op
-  ecoskills.command.export:
-    description: Allows the use of /ecoskills export.
     default: op
 
   ecoskills.xpmultiplier.50percent:

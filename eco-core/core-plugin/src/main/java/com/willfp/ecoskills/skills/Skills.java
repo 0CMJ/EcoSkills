@@ -1,7 +1,6 @@
 package com.willfp.ecoskills.skills;
 
 import com.google.common.collect.ImmutableSet;
-import com.willfp.eco.core.EcoPlugin;
 import com.willfp.eco.core.config.updating.ConfigUpdater;
 import com.willfp.eco.core.placeholder.PlayerPlaceholder;
 import com.willfp.eco.util.NumberUtils;
@@ -16,7 +15,6 @@ import com.willfp.ecoskills.skills.skills.SkillFarming;
 import com.willfp.ecoskills.skills.skills.SkillFishing;
 import com.willfp.ecoskills.skills.skills.SkillMining;
 import com.willfp.ecoskills.skills.skills.SkillWoodcutting;
-import com.willfp.ecoskills.stats.Stat;
 import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -73,8 +71,6 @@ public class Skills {
                 "skill_multiplier",
                 (player -> NumberUtils.format(EcoSkillsPlayerKt.getSkillExperienceMultiplier(player)))
         ).register();
-
-        CustomSkills.update(plugin);
 
         for (Skill skill : Skills.values()) {
             skill.update();

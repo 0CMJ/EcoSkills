@@ -1,5 +1,6 @@
 package com.willfp.ecoskills.skills
 
+import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.willfp.eco.core.EcoPlugin
 import com.willfp.eco.core.config.interfaces.Config
@@ -8,6 +9,7 @@ import com.willfp.eco.core.data.keys.PersistentDataKeyType
 import com.willfp.eco.core.integrations.afk.AFKManager
 import com.willfp.eco.core.placeholder.PlayerPlaceholder
 import com.willfp.eco.core.placeholder.PlayerlessPlaceholder
+import com.willfp.eco.core.registry.Registrable
 import com.willfp.eco.util.NumberUtils
 import com.willfp.eco.util.StringUtils
 import com.willfp.eco.util.containsIgnoreCase
@@ -24,14 +26,19 @@ import com.willfp.ecoskills.stats.Stats
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.NamespacedKey
+import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
+import java.time.Duration
 
 abstract class Skill @JvmOverloads constructor(
     val id: String,
     forceConfig: Config? = null
-) : Listener {
+) : Listener, Registrable {
     protected val plugin: EcoPlugin = EcoSkillsPlugin.getInstance()
+    val leaderBoardCache: Cache<Int, LeaderboardCacheEntry?> = Caffeine.newBuilder()
+        .expireAfterWrite(Duration.ofSeconds(plugin.configYml.getInt("cache-expire-after").toLong()))
+        .build()
 
     val key: NamespacedKey = plugin.namespacedKeyFactory.create(id)
 
@@ -240,6 +247,17 @@ abstract class Skill @JvmOverloads constructor(
         return levels
     }
 
+    fun getTop(place: Int): LeaderboardCacheEntry? {
+        return leaderBoardCache.get(place) {
+            val top = Bukkit.getOfflinePlayers()
+                .sortedByDescending { it.getSkillLevel(this) }.getOrNull(place - 1)
+
+            if (top == null) {
+                null
+            } else LeaderboardCacheEntry(top, top.getSkillLevel(this))
+        }
+    }
+
     fun getRewardsMessages(player: Player?, level: Int): List<String> {
         val raw = messagesCache.get(level) {
             val parentSection = this.config.getSubsection("rewards.chat-messages")
@@ -342,6 +360,10 @@ abstract class Skill @JvmOverloads constructor(
         // Override when needed
     }
 
+    override fun getID(): String {
+        return id
+    }
+
     fun getExpForLevel(level: Int): Int {
         val req = xpRequirements
         return if (maxLevel < level) {
@@ -351,3 +373,5 @@ abstract class Skill @JvmOverloads constructor(
         }
     }
 }
+
+data class LeaderboardCacheEntry(val player: OfflinePlayer, val amount: Int)
